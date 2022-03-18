@@ -1,0 +1,52 @@
+{
+    "name": "PlayerIn",
+    "maps": [
+        {
+            "name": "InGame",
+            "id": "4c2dab95-a60e-46e3-b98f-769a0edf4b80",
+            "actions": [
+                {
+                    "name": "Position",
+                    "type": "Value",
+                    "id": "3315d9da-3e03-454b-9896-db7183b11ce9",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Select",
+                    "type": "Button",
+                    "id": "d446d4c7-6bee-406e-90c6-df4b63df7e83",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "9f17631f-2ee7-4188-8e7c-9cb97ad13ef0",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "04cb9885-4b57-4206-8348-d88e3adc71ab",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
