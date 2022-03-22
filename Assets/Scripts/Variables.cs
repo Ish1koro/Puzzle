@@ -27,13 +27,7 @@ public static class Variables
     #endregion
 
     #region 配列関係
-    public static int _cant_Move_Area { get; } = 1 << 1 | 1 << 2;
-    public static int _air { get; } = 0;
-    public static int _wall { get; } = 1;
-    public static int _old_Mino { get; } = 2;
-    public static int _now_Mino { get; } = 3;
-    public static int _mino_Center { get; } = 4;
-    public static int _can_Fall_Position { get; } = 5;
+
     #endregion
 
     /// <summary>

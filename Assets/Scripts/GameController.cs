@@ -11,7 +11,9 @@ public class GameController : MonoBehaviour
     private float _drop_Time = Variables._drop_Move_Time;
     #endregion
 
-
+    /// <summary>
+    /// Œ»İ‚Ìˆ—‚Ìó‘Ô
+    /// </summary>
     private enum _player_State
     {
         Generate,
@@ -57,14 +59,7 @@ public class GameController : MonoBehaviour
 
     private void Move()
     {
-
         _map._get_Stage[Mathf.RoundToInt(_playerController._Mouse_Position.y), Mathf.RoundToInt(_playerController._Mouse_Position.x)].transform.position = _playerController._Mouse_Position;
 
-        _drop_Time -= Time.deltaTime;
-        if (_drop_Time < Variables._zero)
-        {
-            _now_state = _player_State.MoveDelete;
-            _drop_Time = Variables._drop_Move_Time;
-        }
     }
 }

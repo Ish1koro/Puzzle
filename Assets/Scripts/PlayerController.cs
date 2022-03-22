@@ -28,6 +28,10 @@ public class PlayerController : MonoBehaviour
     /// ƒhƒƒbƒv‚ğ“®‚©‚¹‚éŠÔ
     /// </summary>
     private bool _canMove = false;
+    public bool Can_Move
+    {
+        get { return _canMove; }
+    }
     #endregion
 
     #region float
@@ -57,7 +61,10 @@ public class PlayerController : MonoBehaviour
 
     private void Move(InputAction.CallbackContext obj)
     {
-        _mouse_Position = Camera.main.ScreenToWorldPoint(obj.ReadValue<Vector2>());
+        if (_canMove)
+        {
+            _mouse_Position = Camera.main.ScreenToWorldPoint(obj.ReadValue<Vector2>());
+        }
     }
 
     private void Select(InputAction.CallbackContext obj)
