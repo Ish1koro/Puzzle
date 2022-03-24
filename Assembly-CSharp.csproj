@@ -57,10 +57,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\PlayerController.cs" />
-    <Compile Include="Assets\Scripts\Variables.cs" />
-    <Compile Include="Assets\Scripts\Map.cs" />
     <Compile Include="Assets\Scripts\Select_Sprite.cs" />
-    <Compile Include="Assets\Scripts\GameController.cs" />
+    <Compile Include="Assets\Scripts\Variables.cs" />
+    <Compile Include="Assets\Input\PlayerIn.cs" />
+    <Compile Include="Assets\Scripts\Map.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

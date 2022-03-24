@@ -262,8 +262,8 @@
     <Compile Include="Assets\Plugins\UniRx\Scripts\Operators\SkipWhile.cs" />
     <Compile Include="Assets\Plugins\UniRx\Scripts\UnityEngineBridge\Triggers\ObservableParticleTrigger.cs" />
     <Compile Include="Assets\Plugins\UniRx\Scripts\Operators\AsSingleUnitObservable.cs" />
-    <Compile Include="Assets\Plugins\UniRx\Scripts\InternalUtil\ThreadSafeQueueWorker.cs" />
     <Compile Include="Assets\Plugins\UniRx\Scripts\UnityEngineBridge\Triggers\ObservablePointerUpTrigger.cs" />
+    <Compile Include="Assets\Plugins\UniRx\Scripts\InternalUtil\ThreadSafeQueueWorker.cs" />
     <Compile Include="Assets\Plugins\UniRx\Scripts\UnityEngineBridge\Operators\ThrottleFirstFrame.cs" />
     <Compile Include="Assets\Plugins\UniRx\Scripts\UnityEngineBridge\Triggers\ObservableDragTrigger.cs" />
     <Compile Include="Assets\Plugins\UniRx\Scripts\Subjects\AsyncSubject.cs" />

@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-// 読み取り専用の変数を定義するクラス
+﻿// 読み取り専用の変数を定義するクラス
 // マジックナンバー防止用
 public static class Variables
 {
@@ -15,7 +11,7 @@ public static class Variables
     public static int _five { get; } = 5;
     public static int _six { get; } = 6;
 
-    public static int _drop_Move_Time { get; } = 4;
+    public static int _drop_Move_Time { get; } = 10;
     #endregion
 
     #region InputSystemのActionsの名前
@@ -24,10 +20,6 @@ public static class Variables
     /// </summary>
     public static string _position { get; } = "Position";
     public static string _select { get; } = "Select";
-    #endregion
-
-    #region 配列関係
-
     #endregion
 
     /// <summary>

@@ -2,13 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     #region 他クラス参照
-    private PlayerInput _input = default;
-
+    /// <summary>
+    /// 入力された値
+    /// </summary>
+    private PlayerIn _input = default;
+    
+    /// <summary>
+    /// 配列クラス
+    /// </summary>
     private Map _map = default;
     #endregion
 
@@ -24,51 +29,139 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region bool
-    /// <summary>
-    /// ドロップを動かせる時間
-    /// </summary>
-    private bool _canMove = false;
-    public bool Can_Move
+    private bool _isCatch = false;
+    public bool IsCatch
     {
-        get { return _canMove; }
+        get { return _isCatch; }
     }
     #endregion
 
     #region float
-    /// <summary>
-    /// ドロップを動かせる残り秒数
-    /// </summary>
-    private float _move_Time = Variables._six;
+    private float _drop_Time = Variables._drop_Move_Time;
     #endregion
+
+    /// <summary>
+    /// 現在の処理の状態
+    /// </summary>
+    public enum _player_State
+    {
+        Generate,
+        Move,
+        MoveDelete,
+        RandomGenerate,
+        Fall,
+        FallDelete,
+    }
+
+    public _player_State _now_state = default;
 
     private void Awake()
     {
-        _input = GetComponent<PlayerInput>();
+        _input = new PlayerIn();
         _map = GetComponent<Map>();
+        //_now_state = _player_State.Generate;
     }
+
+    private void Update()
+    {
+        if (_input.InGame.Select.phase == UnityEngine.InputSystem.InputActionPhase.Started)
+        {
+            _isCatch = true;
+        }
+        else
+        {
+            _isCatch = false;
+        }
+
+        _mouse_Position = Camera.main.ScreenToWorldPoint(_input.InGame.Position.ReadValue<Vector2>());
+
+        #region Drop位置の制限
+        if (_mouse_Position.y >= Variables._four)
+        {
+            _mouse_Position.y = Variables._four;
+        }
+        else if (_mouse_Position.y < Variables._zero)
+        {
+            _mouse_Position.y = Variables._zero;
+        }
+
+        if (_mouse_Position.x >= Variables._five)
+        {
+            _mouse_Position.x = Variables._five;
+        }
+        else if (_mouse_Position.x < Variables._zero)
+        {
+            _mouse_Position.x = Variables._zero;
+        }
+        #endregion
+
+        switch (_now_state)
+        {
+            case _player_State.Generate:
+                Generate();
+                break;
+            case _player_State.Move:
+                Move();
+                break;
+                /*
+            case _player_State.MoveDelete:
+                MoveDelete();
+                break;
+            case _player_State.Fall:
+                Fall();
+                break;
+            case _player_State.FallDelete:
+                FallDelete();
+                break;
+            case _player_State.RandomGenerate:
+                RandomGenerate();
+                break;*/
+        }
+    }
+
+    private void Generate()
+    {
+        _map.Generate();
+        _now_state = _player_State.Move;
+    }
+
+    private void Move()
+    {
+        _map.Move();
+    }
+
+    private void MoveDelete()
+    {
+        _map.Delete();
+        _now_state = _player_State.Fall;
+    }
+
+    private void Fall()
+    {
+        _map.Fall();
+        _now_state = _player_State.FallDelete;
+    }
+
+    private void FallDelete()
+    {
+        _map.Delete();
+        _now_state = _player_State.RandomGenerate;
+    }
+
+    private void RandomGenerate()
+    {
+        _map.RandomGenerate();
+        _now_state = _player_State.Move;
+    }
+
 
     private void OnEnable()
     {
-        _input.actions[Variables._position].performed += Move;
-        _input.actions[Variables._select].performed += Select;
+        _input.Enable();
     }
 
     private void OnDisable()
     {
-        _input.actions[Variables._position].performed -= Move;
-        _input.actions[Variables._select].performed -= Select;
-    }
-
-    private void Move(InputAction.CallbackContext obj)
-    {
-        if (_canMove)
-        {
-            _mouse_Position = Camera.main.ScreenToWorldPoint(obj.ReadValue<Vector2>());
-        }
-    }
-
-    private void Select(InputAction.CallbackContext obj)
-    {
-        _canMove = obj.ReadValue<bool>();
+        _input.Disable();
     }
 }
