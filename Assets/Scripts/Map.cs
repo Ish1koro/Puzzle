@@ -200,18 +200,30 @@ public class Map : MonoBehaviour
     /// </summary>
     private void SearchX()
     {
+        // 配列のy座標の最後まで
         for (int y = default; y < _stage_Object.GetLength(Variables._zero); y++)
         {
+        // 配列のx座標の最後まで
             for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
             {
-                if (_stage_Object[y, x] == _stage_Object[y, x + Variables._one] && _stage_Object[y, x] == _stage_Object[y, x + Variables._two])
+                // つながっている数
+                for (int i = default; x + i < _stage_Object.GetLength(Variables._zero); i++)
                 {
-                    for (int i = default; _stage_Object[y, x].tag == _stage_Object[y, x + i].tag; i++)
+                    // 右隣のtagが同じとき
+                    if (_stage_Object[y, x].tag == _stage_Object[y, x + i].tag)
                     {
+                        // 削除する配列に入れる
                         delete_Queue[_combo, i] = _stage_Object[y, x + i];
+                    }
+                    else
+                    {
+                        // 削除する配列に入れた分x座標を足す
+                        x += i;
+                        break;
                     }
                 }
 
+                // 
                 if (y + Variables._one < _stage_Object.GetLength(Variables._one))
                 {
                     if (_stage_Object[y, x].tag == _stage_Object[y + Variables._one, x].tag)
