@@ -71,8 +71,9 @@ public class Map : MonoBehaviour
 
     #region bool
     /// <summary>
-    /// “®‚©‚·mino‚Éİ’è‚³‚ê‚Ä‚¢‚é‚©
+    /// Drop‚ª3‚ÂˆÈã“¯‚¶‚©
     /// </summary>
+    private bool _isSameDrops = default;
     #endregion
 
     #region ”z—ñ
@@ -94,6 +95,8 @@ public class Map : MonoBehaviour
     /// </summary>
     private const int _STAGE_MIDDLE = 2 | 5;
     #endregion
+
+    //---------------------------------------------------------------------------------------------------------
 
     private void Awake()
     {
@@ -162,7 +165,7 @@ public class Map : MonoBehaviour
             // ‘€ìŠÔ
             _drop_Time -= Time.deltaTime;
         }
-        else
+        else if(_drop_Time != Variables._drop_Move_Time)
         {
             // “®‚©‚µ‚Ä‚¢‚éDrop‚ª‚ ‚ê‚Î‰ğœ‚·‚é
             if (_moving_Drop != null)
@@ -184,11 +187,12 @@ public class Map : MonoBehaviour
         int x = default;
 
         SearchX();
-        SearchY();
+
         for (int y = default; y < delete_Queue.GetLength(Variables._zero); y++)
         {
             Destroy(delete_Queue[y, x]);
         }
+        StartCoroutine("Delete_Queue");
     }
 
     /// <summary>
@@ -196,12 +200,32 @@ public class Map : MonoBehaviour
     /// </summary>
     private void SearchX()
     {
+        for (int y = default; y < _stage_Object.GetLength(Variables._zero); y++)
+        {
+            for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
+            {
+                if (_stage_Object[y, x] == _stage_Object[y, x + Variables._one] && _stage_Object[y, x] == _stage_Object[y, x + Variables._two])
+                {
+                    for (int i = default; _stage_Object[y, x].tag == _stage_Object[y, x + i].tag; i++)
+                    {
+                        delete_Queue[_combo, i] = _stage_Object[y, x + i];
+                    }
+                }
 
+                if (y + Variables._one < _stage_Object.GetLength(Variables._one))
+                {
+                    if (_stage_Object[y, x].tag == _stage_Object[y + Variables._one, x].tag)
+                    {
+
+                    }
+                }
+            }
+        }
     }
-
-    private void SearchY()
+    
+    private IEnumerator Delete_Queue()
     {
-
+        yield return new WaitForSeconds(1);
     }
 
     //---------------------------------------------------------------------------------------------------------

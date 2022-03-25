@@ -29,17 +29,14 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region bool
-    private bool _isCatch = false;
+    private bool _isCatch = default;
     public bool IsCatch
     {
         get { return _isCatch; }
     }
     #endregion
 
-    #region float
-    private float _drop_Time = Variables._drop_Move_Time;
-    #endregion
-
+    #region enum
     /// <summary>
     /// åªç›ÇÃèàóùÇÃèÛë‘
     /// </summary>
@@ -53,14 +50,21 @@ public class PlayerController : MonoBehaviour
         FallDelete,
     }
 
+    /// <summary>
+    /// åªç›ÇÃèàóùÇÃèÛë‘
+    /// </summary>
     public _player_State _now_state = default;
+    #endregion
+
+    //---------------------------------------------------------------------------------------------------------
 
     private void Awake()
     {
         _input = new PlayerIn();
         _map = GetComponent<Map>();
-        //_now_state = _player_State.Generate;
     }
+
+    //---------------------------------------------------------------------------------------------------------
 
     private void Update()
     {
@@ -119,16 +123,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //---------------------------------------------------------------------------------------------------------
+
     private void Generate()
     {
         _map.Generate();
         _now_state = _player_State.Move;
     }
 
+    //---------------------------------------------------------------------------------------------------------
+
     private void Move()
     {
         _map.Move();
     }
+
+    //---------------------------------------------------------------------------------------------------------
 
     private void MoveDelete()
     {
@@ -136,11 +146,15 @@ public class PlayerController : MonoBehaviour
         _now_state = _player_State.Fall;
     }
 
+    //---------------------------------------------------------------------------------------------------------
+
     private void Fall()
     {
         _map.Fall();
         _now_state = _player_State.FallDelete;
     }
+
+    //---------------------------------------------------------------------------------------------------------
 
     private void FallDelete()
     {
@@ -148,12 +162,15 @@ public class PlayerController : MonoBehaviour
         _now_state = _player_State.RandomGenerate;
     }
 
+    //---------------------------------------------------------------------------------------------------------
+
     private void RandomGenerate()
     {
         _map.RandomGenerate();
         _now_state = _player_State.Move;
     }
 
+    //---------------------------------------------------------------------------------------------------------
 
     private void OnEnable()
     {
