@@ -10,6 +10,7 @@ public static class Variables
     public static int _four { get; } = 4;
     public static int _five { get; } = 5;
     public static int _six { get; } = 6;
+    public static int _thirty { get; } = 30;
 
     public static int _drop_Move_Time { get; } = 10;
     #endregion
@@ -20,6 +21,7 @@ public static class Variables
     /// </summary>
     public static string _position { get; } = "Position";
     public static string _select { get; } = "Select";
+    public static string _drop { get; } = "Drop";
     #endregion
 
     /// <summary>

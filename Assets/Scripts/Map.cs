@@ -15,14 +15,27 @@ public class Map : MonoBehaviour
     /// <summary>
     /// 生成するDrop
     /// </summary>
-    [SerializeField] private GameObject _generate_Drop = default;
+    private GameObject _generate_Drop = default;
 
     /// <summary>
     /// 現在動かしているDrop
     /// </summary>
     private GameObject _moving_Drop = default;
 
-    private GameObject[,] delete_Queue = new GameObject[20,30];
+    /// <summary>
+    /// 実際に消す配列
+    /// </summary>
+    private GameObject[] _delete_Queue = new GameObject[Variables._thirty];
+
+    /// <summary>
+    /// 横を見ているときに仮に入れる配列
+    /// </summary>
+    private GameObject[] _delete_Queue_x = new GameObject[Variables._six];
+
+    /// <summary>
+    /// 縦を見ているときに仮に入れる配列
+    /// </summary>
+    private GameObject[] _delete_Queue_y = new GameObject[Variables._five];
     #endregion
 
     #region 盤面配列
@@ -100,6 +113,7 @@ public class Map : MonoBehaviour
 
     private void Awake()
     {
+        _generate_Drop = (GameObject)Resources.Load(Variables._drop);
         _playerController = GetComponent<PlayerController>();
     }
 
@@ -184,60 +198,109 @@ public class Map : MonoBehaviour
     /// </summary>
     public void Delete()
     {
-        int x = default;
 
-        SearchX();
-
-        for (int y = default; y < delete_Queue.GetLength(Variables._zero); y++)
+        // 配列のy座標の最後まで
+        for (int y = default; y < _stage_Object.GetLength(Variables._zero); y++)
         {
-            Destroy(delete_Queue[y, x]);
+            // 配列のx座標の最後まで
+            for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
+            {
+                if (Stage_Object[y, x])
+                {
+                    SearchX(x, y);
+                }
+            }
         }
-        StartCoroutine("Delete_Queue");
     }
 
     /// <summary>
     /// x軸上に3個以上つながっているか調べる
     /// </summary>
-    private void SearchX()
+    private void SearchX(int x, int y)
     {
-        // 配列のy座標の最後まで
-        for (int y = default; y < _stage_Object.GetLength(Variables._zero); y++)
+        int count = default;
+        // つながっている数
+        for (int right = x; right < _stage_Object.GetLength(Variables._one); right++)
         {
-        // 配列のx座標の最後まで
-            for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
+            // 右隣のtagが同じとき
+            if (_stage_Object[y, x].tag == _stage_Object[y, right].tag)
             {
-                // つながっている数
-                for (int i = default; x + i < _stage_Object.GetLength(Variables._zero); i++)
-                {
-                    // 右隣のtagが同じとき
-                    if (_stage_Object[y, x].tag == _stage_Object[y, x + i].tag)
-                    {
-                        // 削除する配列に入れる
-                        delete_Queue[_combo, i] = _stage_Object[y, x + i];
-                    }
-                    else
-                    {
-                        // 削除する配列に入れた分x座標を足す
-                        x += i;
-                        break;
-                    }
-                }
-
-                // 
-                if (y + Variables._one < _stage_Object.GetLength(Variables._one))
-                {
-                    if (_stage_Object[y, x].tag == _stage_Object[y + Variables._one, x].tag)
-                    {
-
-                    }
-                }
+                // 削除する配列に入れる
+                _delete_Queue_x[count] = _stage_Object[y, right];
+                count++;
+            }
+            else
+            {
+                
+                break;
             }
         }
+
+        if (count > Variables._two)
+        {
+            for (int x_count = default; x_count < count; x_count++)
+            {
+                _delete_Queue[x_count] = _delete_Queue_x[x_count];
+            }
+        }
+        else
+        {
+            _delete_Queue_x = new GameObject[Variables._thirty];
+            count = Variables._zero;
+        }
+        SearchY(x, y, count);
+
     }
-    
+
+    private void SearchY(int x, int y, int count)
+    {
+        int y_count = default;
+        for (int up = y; up < _stage_Object.GetLength(Variables._zero); up++)
+        {
+            // 右隣のtagが同じとき
+            if (_stage_Object[y, x].tag == _stage_Object[up, x].tag)
+            {
+                // 削除する配列に入れる
+                _delete_Queue_y[y_count] = _stage_Object[up, x];
+                y_count++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (y_count > Variables._two)
+        {
+            for (int y_count2 = default; y_count2 < count; y_count2++)
+            {
+                _delete_Queue[count] = _delete_Queue_y[y_count];
+                count++;
+            }
+        }
+        else
+        {
+            _delete_Queue_y = new GameObject[Variables._thirty];
+            count = Variables._zero;
+        }
+
+        StartCoroutine("Delete_Queue");
+    }
+
     private IEnumerator Delete_Queue()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(Variables._one);
+
+        for (int count = default; count < _delete_Queue.GetLength(Variables._zero); count++)
+        {
+            if (!_delete_Queue[count])
+            {
+                yield break;
+            }
+            Destroy(_delete_Queue[count]);
+        }
+
+        yield break;
     }
 
     //---------------------------------------------------------------------------------------------------------
