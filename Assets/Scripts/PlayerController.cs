@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public bool IsCatch
     {
         get { return _isCatch; }
+        set { _isCatch = value; }
     }
     #endregion
 
@@ -107,10 +108,10 @@ public class PlayerController : MonoBehaviour
             case _player_State.Move:
                 Move();
                 break;
-                /*
             case _player_State.MoveDelete:
                 MoveDelete();
                 break;
+                /*
             case _player_State.Fall:
                 Fall();
                 break;
@@ -119,7 +120,8 @@ public class PlayerController : MonoBehaviour
                 break;
             case _player_State.RandomGenerate:
                 RandomGenerate();
-                break;*/
+                break;
+                */
         }
     }
 
@@ -142,7 +144,7 @@ public class PlayerController : MonoBehaviour
 
     private void MoveDelete()
     {
-        _map.Delete();
+        _map.ArrayCheck();
         _now_state = _player_State.Fall;
     }
 

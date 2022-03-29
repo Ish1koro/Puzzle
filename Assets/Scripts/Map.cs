@@ -25,24 +25,24 @@ public class Map : MonoBehaviour
     /// <summary>
     /// 実際に消す配列
     /// </summary>
-    private GameObject[] _delete_Queue = new GameObject[Variables._thirty];
+    [SerializeField, Header("削除する配列")] private GameObject[] _delete_Queue = new GameObject[Variables._thirty];
 
     /// <summary>
     /// 横を見ているときに仮に入れる配列
     /// </summary>
-    private GameObject[] _delete_Queue_x = new GameObject[Variables._six];
+    [SerializeField, Header("x配列")] private GameObject[] _delete_Queue_x = new GameObject[Variables._six];
 
     /// <summary>
     /// 縦を見ているときに仮に入れる配列
     /// </summary>
-    private GameObject[] _delete_Queue_y = new GameObject[Variables._five];
+    [SerializeField, Header("y配列")] private GameObject[] _delete_Queue_y = new GameObject[Variables._five];
     #endregion
 
     #region 盤面配列
     /// <summary>
     /// ステージ
     /// </summary>
-    private GameObject[,] _stage_Object = new GameObject[Variables._five, Variables._six];
+    [SerializeField] private GameObject[,] _stage_Object = new GameObject[Variables._five, Variables._six];
 
     /// <summary>
     /// ステージ取得用
@@ -73,6 +73,12 @@ public class Map : MonoBehaviour
     /// コンボ数
     /// </summary>
     private int _combo = default;
+
+    private int _drop_Count = default;
+    #endregion
+
+    #region bool
+    private bool _cant_Delete = false;
     #endregion
 
     #region float
@@ -80,13 +86,6 @@ public class Map : MonoBehaviour
     /// ドロップの移動時間
     /// </summary>
     private float _drop_Time = Variables._drop_Move_Time;
-    #endregion
-
-    #region bool
-    /// <summary>
-    /// Dropが3つ以上同じか
-    /// </summary>
-    private bool _isSameDrops = default;
     #endregion
 
     #region 配列
@@ -133,7 +132,9 @@ public class Map : MonoBehaviour
                     _drop_Type = Random.Range((int)Variables._drop_Type.Fire, (int)Variables._drop_Type.Null);
                     _stage_Object[y, x] = Instantiate(_generate_Drop, new Vector3(x, y), Quaternion.identity);
                     _stage_Object[y, x].GetComponent<Select_Sprite>().ChangeSprite(_drop_Type);
+                    _stage_Object[y, x].name = Variables._drop_Name + _drop_Count;
                     _stage_Object[y, x].tag = Variables._drop_Tag[_drop_Type];
+                    _drop_Count++;
                 }
             }
         }
@@ -187,8 +188,29 @@ public class Map : MonoBehaviour
                 _moving_Drop.transform.position = new Vector2(Mathf.RoundToInt(_moving_Drop.transform.position.x), Mathf.RoundToInt(_moving_Drop.transform.position.y));
                 _moving_Drop = null;
             }
+            
+            _drop_Time = Variables._drop_Move_Time;
+
+
             _playerController._now_state = PlayerController._player_State.MoveDelete;
         }
+    }
+
+    //---------------------------------------------------------------------------------------------------------
+
+    public void ArrayCheck()
+    {
+        for (int y = default; y < _stage_Object.GetLength(Variables._zero); y++)
+        {
+            for(int x = default; x < _stage_Object.GetLength(Variables._zero); x++)
+            {
+                if(_stage_Object[y, x].transform.position != new Vector3(x, y, Variables._zero))
+                {
+
+                }
+            }
+        }
+        Delete();
     }
 
     //---------------------------------------------------------------------------------------------------------
@@ -198,7 +220,6 @@ public class Map : MonoBehaviour
     /// </summary>
     public void Delete()
     {
-
         // 配列のy座標の最後まで
         for (int y = default; y < _stage_Object.GetLength(Variables._zero); y++)
         {
@@ -207,6 +228,7 @@ public class Map : MonoBehaviour
             {
                 if (Stage_Object[y, x])
                 {
+                    Debug.Log(new Vector2( x, y));
                     SearchX(x, y);
                 }
             }
@@ -218,8 +240,9 @@ public class Map : MonoBehaviour
     /// </summary>
     private void SearchX(int x, int y)
     {
-        int count = default;
         // つながっている数
+        int count = default;
+
         for (int right = x; right < _stage_Object.GetLength(Variables._one); right++)
         {
             // 右隣のtagが同じとき
@@ -238,50 +261,63 @@ public class Map : MonoBehaviour
 
         if (count > Variables._two)
         {
-            for (int x_count = default; x_count < count; x_count++)
+            for (int x_count = default; x_count != count; x_count++)
             {
                 _delete_Queue[x_count] = _delete_Queue_x[x_count];
             }
         }
         else
         {
-            _delete_Queue_x = new GameObject[Variables._thirty];
             count = Variables._zero;
+            _delete_Queue_x = new GameObject[Variables._six];
         }
         SearchY(x, y, count);
 
     }
 
-    private void SearchY(int x, int y, int count)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="x">現在調べているx座標</param>
+    /// <param name="y">現在調べているy座標</param>
+    /// <param name="queue">削除する配列の現在の順番</param>
+    private void SearchY(int x, int y, int queue)
     {
-        int y_count = default;
+        // y座標でつながっている数
+        int count = default;
+
         for (int up = y; up < _stage_Object.GetLength(Variables._zero); up++)
         {
             // 右隣のtagが同じとき
             if (_stage_Object[y, x].tag == _stage_Object[up, x].tag)
             {
                 // 削除する配列に入れる
-                _delete_Queue_y[y_count] = _stage_Object[up, x];
-                y_count++;
+                _delete_Queue_y[count] = _stage_Object[up, x];
+                count++;
             }
+            // 違ったら抜ける
             else
             {
                 break;
             }
         }
 
-        if (y_count > Variables._two)
+        // つながっている数が2より大きいとき
+        if (count > Variables._two)
         {
-            for (int y_count2 = default; y_count2 < count; y_count2++)
+            // つながっている数を超えるまで
+            for (int y_count = default; y_count > count; y_count++)
             {
-                _delete_Queue[count] = _delete_Queue_y[y_count];
-                count++;
+                // 削除する配列に入れる
+                _delete_Queue[queue] = _delete_Queue_y[count];
+                queue++;
             }
         }
+        // 2以下の場合
         else
         {
-            _delete_Queue_y = new GameObject[Variables._thirty];
-            count = Variables._zero;
+            // 仮に入れた配列を初期化
+            _delete_Queue_y = new GameObject[Variables._five];
         }
 
         StartCoroutine("Delete_Queue");
@@ -289,17 +325,16 @@ public class Map : MonoBehaviour
 
     private IEnumerator Delete_Queue()
     {
-        yield return new WaitForSeconds(Variables._one);
-
         for (int count = default; count < _delete_Queue.GetLength(Variables._zero); count++)
         {
             if (!_delete_Queue[count])
             {
                 yield break;
             }
+
             Destroy(_delete_Queue[count]);
         }
-
+        _combo++;
         yield break;
     }
 
@@ -341,14 +376,15 @@ public class Map : MonoBehaviour
         {
             for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
             {
-                if (_stage_Object[y, x] == null)
+                if (!_stage_Object[y, x])
                 {
                     int fetch_y = y;
 
-                    while (_stage_Object[fetch_y, x] == null)
+                    while (!_stage_Object[fetch_y, x])
                     {
                         fetch_y++;
                     }
+
                     _stage_Object[y, x] = _stage_Object[fetch_y, x];
                     _stage_Object[fetch_y, x].transform.position = new Vector2(x, fetch_y);
                     _stage_Object[fetch_y, x] = null;

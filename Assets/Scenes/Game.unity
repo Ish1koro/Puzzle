@@ -319,7 +319,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45a3fa09ce8dd7d41a9a321ec01a977a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _generate_Drop: {fileID: 5045460610204150593, guid: 3737c95f5c2aa6448b1782ebd0a0db63, type: 3}
+  _delete_Queue:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _delete_Queue_x:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &2082186208
 MonoBehaviour:
   m_ObjectHideFlags: 0

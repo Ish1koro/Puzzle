@@ -38,5 +38,7 @@ public static class Variables
         Null
     }
 
+    public static string _drop_Name { get; } = "Drop_";
+
     public static string[] _drop_Tag { get; } = new string[6] { "Fire", "Water", "Wood", "Light", "Dark", "Heal" };
 }
