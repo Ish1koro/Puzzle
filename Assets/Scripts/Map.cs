@@ -78,7 +78,10 @@ public class Map : MonoBehaviour
     #endregion
 
     #region bool
-    private bool _cant_Delete = false;
+    /// <summary>
+    /// 
+    /// </summary>
+    private bool _isExist = default;
     #endregion
 
     #region float
@@ -198,23 +201,6 @@ public class Map : MonoBehaviour
 
     //---------------------------------------------------------------------------------------------------------
 
-    public void ArrayCheck()
-    {
-        for (int y = default; y < _stage_Object.GetLength(Variables._zero); y++)
-        {
-            for(int x = default; x < _stage_Object.GetLength(Variables._zero); x++)
-            {
-                if(_stage_Object[y, x].transform.position != new Vector3(x, y, Variables._zero))
-                {
-
-                }
-            }
-        }
-        Delete();
-    }
-
-    //---------------------------------------------------------------------------------------------------------
-
     /// <summary>
     /// Dropの削除処理
     /// </summary>
@@ -226,9 +212,9 @@ public class Map : MonoBehaviour
             // 配列のx座標の最後まで
             for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
             {
+                // 配列上に存在すれば続ける
                 if (Stage_Object[y, x])
                 {
-                    Debug.Log(new Vector2( x, y));
                     SearchX(x, y);
                 }
             }
@@ -238,23 +224,67 @@ public class Map : MonoBehaviour
     /// <summary>
     /// x軸上に3個以上つながっているか調べる
     /// </summary>
+    /// <param name="x">現在調べているx座標</param>
+    /// <param name="y">現在調べているy座標</param>
     private void SearchX(int x, int y)
     {
         // つながっている数
         int count = default;
 
+        // 右にあるDropの探索
         for (int right = x; right < _stage_Object.GetLength(Variables._one); right++)
         {
-            // 右隣のtagが同じとき
-            if (_stage_Object[y, x].tag == _stage_Object[y, right].tag)
+            for (int queue_count = default; queue_count < _delete_Queue_x.GetLength(Variables._zero); queue_count++)
+            {
+                // もし削除配列上に現在調べているDropがあったらtrueにする
+                if (_delete_Queue_x[queue_count] == _stage_Object[y, right])
+                {
+                    _isExist = true;
+                }
+                else
+                {
+                    _isExist = false;
+                }
+            }
+
+            // 右隣のtagが同じで配列上に存在しないときとき
+            if (_stage_Object[y, x].tag == _stage_Object[y, right].tag && !_isExist)
             {
                 // 削除する配列に入れる
                 _delete_Queue_x[count] = _stage_Object[y, right];
                 count++;
             }
             else
+            {   
+                break;
+            }
+        }
+
+        // 左にあるDropの探索
+        for (int left = x - Variables._one; left >= Variables._zero; left--)
+        {
+            for (int queue_count = default; queue_count < _delete_Queue_x.GetLength(Variables._zero); queue_count++)
             {
-                
+                // もし削除配列上に現在調べているDropがあったらtrueにする
+                if (_delete_Queue_x[queue_count] == _stage_Object[y, left])
+                {
+                    _isExist = true;
+                }
+                else
+                {
+                    _isExist = false;
+                }
+            }
+
+            // 左隣のtagが同じとき
+            if (_stage_Object[y, x].tag == _stage_Object[y, left].tag)
+            {
+                // 削除する配列に入れる
+                _delete_Queue_x[count] = _stage_Object[y, left];
+                count++;
+            }
+            else
+            {
                 break;
             }
         }
@@ -271,12 +301,12 @@ public class Map : MonoBehaviour
             count = Variables._zero;
             _delete_Queue_x = new GameObject[Variables._six];
         }
-        SearchY(x, y, count);
 
+        SearchY(x, y, count);
     }
 
     /// <summary>
-    /// 
+    /// y軸上に3個以上つながっているか調べる
     /// </summary>
     /// <param name="x">現在調べているx座標</param>
     /// <param name="y">現在調べているy座標</param>
@@ -288,14 +318,23 @@ public class Map : MonoBehaviour
 
         for (int up = y; up < _stage_Object.GetLength(Variables._zero); up++)
         {
-            // 右隣のtagが同じとき
+            for (int queue_count = default; queue_count < _delete_Queue_x.GetLength(Variables._zero); queue_count++)
+            {
+                // もし削除配列上に現在調べているDropがあったらtrueにする
+                if (_delete_Queue_x[queue_count] == _stage_Object[up, x])
+                {
+                    _isExist = true;
+                }
+            }
+
+            // 上のtagが同じとき
             if (_stage_Object[y, x].tag == _stage_Object[up, x].tag)
             {
                 // 削除する配列に入れる
                 _delete_Queue_y[count] = _stage_Object[up, x];
                 count++;
             }
-            // 違ったら抜ける
+            // 違ったらfor文を抜ける
             else
             {
                 break;
@@ -306,10 +345,10 @@ public class Map : MonoBehaviour
         if (count > Variables._two)
         {
             // つながっている数を超えるまで
-            for (int y_count = default; y_count > count; y_count++)
+            for (int y_count = default; y_count < count; y_count++)
             {
                 // 削除する配列に入れる
-                _delete_Queue[queue] = _delete_Queue_y[count];
+                _delete_Queue[queue] = _delete_Queue_y[y_count];
                 queue++;
             }
         }
@@ -320,7 +359,7 @@ public class Map : MonoBehaviour
             _delete_Queue_y = new GameObject[Variables._five];
         }
 
-        StartCoroutine("Delete_Queue");
+        StartCoroutine(Delete_Queue());
     }
 
     private IEnumerator Delete_Queue()
@@ -332,9 +371,13 @@ public class Map : MonoBehaviour
                 yield break;
             }
 
-            Destroy(_delete_Queue[count]);
+            _delete_Queue[count].SetActive(false);
+            Debug.Log("A");
+            //Destroy(_delete_Queue[count]);
         }
-        _combo++;
+        
+        yield return new WaitForSeconds(Variables._one);
+
         yield break;
     }
 
@@ -376,18 +419,9 @@ public class Map : MonoBehaviour
         {
             for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
             {
-                if (!_stage_Object[y, x])
+                if (!_stage_Object[x, y])
                 {
-                    int fetch_y = y;
 
-                    while (!_stage_Object[fetch_y, x])
-                    {
-                        fetch_y++;
-                    }
-
-                    _stage_Object[y, x] = _stage_Object[fetch_y, x];
-                    _stage_Object[fetch_y, x].transform.position = new Vector2(x, fetch_y);
-                    _stage_Object[fetch_y, x] = null;
                 }
             }
         }

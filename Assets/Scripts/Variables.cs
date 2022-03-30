@@ -13,6 +13,7 @@ public static class Variables
     public static int _thirty { get; } = 30;
 
     public static int _drop_Move_Time { get; } = 10;
+    public static int _thousand { get; } = 1000;
     #endregion
 
     #region InputSystemのActionsの名前

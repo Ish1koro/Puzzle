@@ -33,7 +33,6 @@ public class PlayerController : MonoBehaviour
     public bool IsCatch
     {
         get { return _isCatch; }
-        set { _isCatch = value; }
     }
     #endregion
 
@@ -69,6 +68,36 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        Input();
+
+        switch (_now_state)
+        {
+            case _player_State.Generate:
+                Generate();
+                break;
+            case _player_State.Move:
+                Move();
+                break;
+            case _player_State.MoveDelete:
+                MoveDelete();
+                break;
+            case _player_State.Fall:
+                Fall();
+                break;
+            case _player_State.FallDelete:
+                FallDelete();
+                break;
+            case _player_State.RandomGenerate:
+                RandomGenerate();
+                break;
+                
+        }
+    }
+
+    //---------------------------------------------------------------------------------------------------------
+
+    private void Input()
+    {
         if (_input.InGame.Select.phase == UnityEngine.InputSystem.InputActionPhase.Started)
         {
             _isCatch = true;
@@ -99,34 +128,13 @@ public class PlayerController : MonoBehaviour
             _mouse_Position.x = Variables._zero;
         }
         #endregion
-
-        switch (_now_state)
-        {
-            case _player_State.Generate:
-                Generate();
-                break;
-            case _player_State.Move:
-                Move();
-                break;
-            case _player_State.MoveDelete:
-                MoveDelete();
-                break;
-                /*
-            case _player_State.Fall:
-                Fall();
-                break;
-            case _player_State.FallDelete:
-                FallDelete();
-                break;
-            case _player_State.RandomGenerate:
-                RandomGenerate();
-                break;
-                */
-        }
     }
 
     //---------------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// ê∂ê¨
+    /// </summary>
     private void Generate()
     {
         _map.Generate();
@@ -135,6 +143,9 @@ public class PlayerController : MonoBehaviour
 
     //---------------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// à⁄ìÆ
+    /// </summary>
     private void Move()
     {
         _map.Move();
@@ -142,14 +153,20 @@ public class PlayerController : MonoBehaviour
 
     //---------------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// çÌèú
+    /// </summary>
     private void MoveDelete()
     {
-        _map.ArrayCheck();
+        _map.Delete();
         _now_state = _player_State.Fall;
     }
 
     //---------------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// óéâ∫
+    /// </summary>
     private void Fall()
     {
         _map.Fall();
@@ -158,6 +175,9 @@ public class PlayerController : MonoBehaviour
 
     //---------------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// óéâ∫å„ÇÃçÌèú
+    /// </summary>
     private void FallDelete()
     {
         _map.Delete();
@@ -166,6 +186,9 @@ public class PlayerController : MonoBehaviour
 
     //---------------------------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// óéâ∫å„ÇÃÉâÉìÉ_ÉÄÇ»ê∂ê¨
+    /// </summary>
     private void RandomGenerate()
     {
         _map.RandomGenerate();
@@ -173,7 +196,8 @@ public class PlayerController : MonoBehaviour
     }
 
     //---------------------------------------------------------------------------------------------------------
-
+    ///InputSystem
+    
     private void OnEnable()
     {
         _input.Enable();
