@@ -216,6 +216,8 @@ public class Map : MonoBehaviour
                 if (Stage_Object[y, x])
                 {
                     SearchX(x, y);
+
+                    Delete_Queue();
                 }
             }
         }
@@ -324,15 +326,20 @@ public class Map : MonoBehaviour
                 if (_delete_Queue_x[queue_count] == _stage_Object[up, x])
                 {
                     _isExist = true;
+                    break;
                 }
             }
 
             // ã‚Ìtag‚ª“¯‚¶‚Æ‚«
-            if (_stage_Object[y, x].tag == _stage_Object[up, x].tag)
+            if (_stage_Object[y, x].tag == _stage_Object[up, x].tag && !_isExist)
             {
                 // íœ‚·‚é”z—ñ‚É“ü‚ê‚é
                 _delete_Queue_y[count] = _stage_Object[up, x];
                 count++;
+            }
+            else if (_isExist)
+            {
+                return;
             }
             // ˆá‚Á‚½‚çfor•¶‚ğ”²‚¯‚é
             else
@@ -358,27 +365,22 @@ public class Map : MonoBehaviour
             // ‰¼‚É“ü‚ê‚½”z—ñ‚ğ‰Šú‰»
             _delete_Queue_y = new GameObject[Variables._five];
         }
-
-        StartCoroutine(Delete_Queue());
     }
 
-    private IEnumerator Delete_Queue()
+    private void Delete_Queue()
     {
         for (int count = default; count < _delete_Queue.GetLength(Variables._zero); count++)
         {
             if (!_delete_Queue[count])
             {
-                yield break;
+                break;
             }
 
-            _delete_Queue[count].SetActive(false);
+            Destroy(_delete_Queue[count]);
             Debug.Log("A");
-            //Destroy(_delete_Queue[count]);
-        }
-        
-        yield return new WaitForSeconds(Variables._one);
 
-        yield break;
+         _playerController._now_state = PlayerController._player_State.Fall;
+        }
     }
 
     //---------------------------------------------------------------------------------------------------------
@@ -415,13 +417,23 @@ public class Map : MonoBehaviour
     /// </summary>
     public void Fall()
     {
-        for (int y = default; y < _stage_Object.GetLength(Variables._one); y++)
+        for (int y = default; y < _stage_Object.GetLength(Variables._zero); y++)
         {
             for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
             {
-                if (!_stage_Object[x, y])
+                if (_stage_Object[y, x] == null)
                 {
+                    Debug.Log(_stage_Object[y, x]);
 
+                    for (int fetch_y = y + Variables._one; fetch_y < _stage_Object.GetLength(Variables._zero); fetch_y++)
+                    {
+                        if (_stage_Object[fetch_y, x])
+                        {
+                            _stage_Object[y, x] = _stage_Object[fetch_y, x];
+                            _stage_Object[y, x].transform.position = new Vector2(x, y);
+                            _stage_Object[fetch_y, x] = null;
+                        }
+                    }
                 }
             }
         }

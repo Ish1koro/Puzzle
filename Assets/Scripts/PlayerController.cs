@@ -84,11 +84,11 @@ public class PlayerController : MonoBehaviour
             case _player_State.Fall:
                 Fall();
                 break;
-            case _player_State.FallDelete:
-                FallDelete();
-                break;
             case _player_State.RandomGenerate:
                 RandomGenerate();
+                break;
+            case _player_State.FallDelete:
+                FallDelete();
                 break;
                 
         }
@@ -159,7 +159,6 @@ public class PlayerController : MonoBehaviour
     private void MoveDelete()
     {
         _map.Delete();
-        _now_state = _player_State.Fall;
     }
 
     //---------------------------------------------------------------------------------------------------------
