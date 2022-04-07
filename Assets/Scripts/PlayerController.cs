@@ -191,12 +191,11 @@ public class PlayerController : MonoBehaviour
     private void RandomGenerate()
     {
         _map.RandomGenerate();
-        _now_state = _player_State.Move;
+        _now_state = _player_State.FallDelete;
     }
 
-    //---------------------------------------------------------------------------------------------------------
-    ///InputSystem
-    
+    //-----------------------------------InputSystem----------------------------------------------------------
+
     private void OnEnable()
     {
         _input.Enable();

@@ -43,14 +43,6 @@ public class Map : MonoBehaviour
     /// ステージ
     /// </summary>
     [SerializeField] private GameObject[,] _stage_Object = new GameObject[Variables._five, Variables._six];
-
-    /// <summary>
-    /// ステージ取得用
-    /// </summary>
-    public GameObject[,] Stage_Object
-    {
-        get { return _stage_Object; }
-    }
     #endregion
 
     #region int
@@ -64,6 +56,7 @@ public class Map : MonoBehaviour
     /// 前回の処理のx座標
     /// </summary>
     private int _old_Position_x = default;
+
     /// <summary>
     /// 前回の処理のy座標
     /// </summary>
@@ -74,12 +67,20 @@ public class Map : MonoBehaviour
     /// </summary>
     private int _combo = default;
 
+    /// <summary>
+    /// 生成したDropの個数
+    /// </summary>
     private int _drop_Count = default;
+
+    /// <summary>
+    /// 削除する配列のキュー
+    /// </summary>
+    private int _queue = default;
     #endregion
 
     #region bool
     /// <summary>
-    /// 
+    /// 配列上に存在するか
     /// </summary>
     private bool _isExist = default;
     #endregion
@@ -115,6 +116,7 @@ public class Map : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log(_stage_Object.Length);
         _generate_Drop = (GameObject)Resources.Load(Variables._drop);
         _playerController = GetComponent<PlayerController>();
     }
@@ -158,6 +160,7 @@ public class Map : MonoBehaviour
             {
                 // マウスの座標にあるDropを取得
                 _moving_Drop = _stage_Object[Mathf.RoundToInt(_playerController._Mouse_Position.y), Mathf.RoundToInt(_playerController._Mouse_Position.x)];
+                
                 // 取ったDropの位置をマウスの位置で取っておく
                 _old_Position_x = Mathf.RoundToInt(_playerController._Mouse_Position.x);
                 _old_Position_y = Mathf.RoundToInt(_playerController._Mouse_Position.y);
@@ -171,10 +174,13 @@ public class Map : MonoBehaviour
             {
                 // 配列上のマウスの座標にあるDropの位置を現在動かしているDropの動かす前の位置に移動させる
                 _stage_Object[Mathf.RoundToInt(_playerController._Mouse_Position.y), Mathf.RoundToInt(_playerController._Mouse_Position.x)].transform.position = new Vector2(_old_Position_x, _old_Position_y);
+                
                 // ↑で移動したDropの配列を更新
                 _stage_Object[_old_Position_y, _old_Position_x] = _stage_Object[Mathf.RoundToInt(_playerController._Mouse_Position.y), Mathf.RoundToInt(_playerController._Mouse_Position.x)];
+                
                 // 空いたところに現在動かしているDropを格納
                 _stage_Object[Mathf.RoundToInt(_playerController._Mouse_Position.y), Mathf.RoundToInt(_playerController._Mouse_Position.x)] = _moving_Drop;
+                
                 // 位置情報更新
                 _old_Position_x = Mathf.RoundToInt(_playerController._Mouse_Position.x);
                 _old_Position_y = Mathf.RoundToInt(_playerController._Mouse_Position.y);
@@ -192,8 +198,8 @@ public class Map : MonoBehaviour
                 _moving_Drop = null;
             }
             
+            // 操作時間の減少
             _drop_Time = Variables._drop_Move_Time;
-
 
             _playerController._now_state = PlayerController._player_State.MoveDelete;
         }
@@ -213,7 +219,7 @@ public class Map : MonoBehaviour
             for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
             {
                 // 配列上に存在すれば続ける
-                if (Stage_Object[y, x])
+                if (_stage_Object[y, x])
                 {
                     SearchX(x, y);
 
@@ -233,12 +239,12 @@ public class Map : MonoBehaviour
         // つながっている数
         int count = default;
 
-        // 右にあるDropの探索
+        #region 右にあるDropの探索
         for (int right = x; right < _stage_Object.GetLength(Variables._one); right++)
         {
+            // 削除配列上に現在調べているDropがあったらtrueにする
             for (int queue_count = default; queue_count < _delete_Queue_x.GetLength(Variables._zero); queue_count++)
             {
-                // もし削除配列上に現在調べているDropがあったらtrueにする
                 if (_delete_Queue_x[queue_count] == _stage_Object[y, right])
                 {
                     _isExist = true;
@@ -261,13 +267,14 @@ public class Map : MonoBehaviour
                 break;
             }
         }
+        #endregion
 
-        // 左にあるDropの探索
+        #region 左にあるDropの探索
         for (int left = x - Variables._one; left >= Variables._zero; left--)
         {
-            for (int queue_count = default; queue_count < _delete_Queue_x.GetLength(Variables._zero); queue_count++)
+            // 削除配列上に現在調べているDropがあったらtrueにする
+            for (int queue_count = default; _delete_Queue_x[queue_count]; queue_count++)
             {
-                // もし削除配列上に現在調べているDropがあったらtrueにする
                 if (_delete_Queue_x[queue_count] == _stage_Object[y, left])
                 {
                     _isExist = true;
@@ -290,21 +297,28 @@ public class Map : MonoBehaviour
                 break;
             }
         }
+        #endregion
 
+        #region 削除するかどうかの判断
         if (count > Variables._two)
         {
             for (int x_count = default; x_count != count; x_count++)
             {
-                _delete_Queue[x_count] = _delete_Queue_x[x_count];
+                _delete_Queue[_queue] = _delete_Queue_x[x_count];
+                _queue++;
             }
+
+            // 仮に入れた配列を初期化
+            _delete_Queue_x = new GameObject[Variables._six];
         }
         else
         {
-            count = Variables._zero;
+            // 仮に入れた配列を初期化
             _delete_Queue_x = new GameObject[Variables._six];
         }
+        #endregion
 
-        SearchY(x, y, count);
+        SearchY(x, y);
     }
 
     /// <summary>
@@ -313,16 +327,16 @@ public class Map : MonoBehaviour
     /// <param name="x">現在調べているx座標</param>
     /// <param name="y">現在調べているy座標</param>
     /// <param name="queue">削除する配列の現在の順番</param>
-    private void SearchY(int x, int y, int queue)
+    private void SearchY(int x, int y)
     {
         // y座標でつながっている数
         int count = default;
 
         for (int up = y; up < _stage_Object.GetLength(Variables._zero); up++)
         {
+            // もし削除配列上に現在調べているDropがあったらtrueにする
             for (int queue_count = default; queue_count < _delete_Queue_x.GetLength(Variables._zero); queue_count++)
             {
-                // もし削除配列上に現在調べているDropがあったらtrueにする
                 if (_delete_Queue_x[queue_count] == _stage_Object[up, x])
                 {
                     _isExist = true;
@@ -337,6 +351,7 @@ public class Map : MonoBehaviour
                 _delete_Queue_y[count] = _stage_Object[up, x];
                 count++;
             }
+            // 配列上に存在したら入れない
             else if (_isExist)
             {
                 return;
@@ -355,9 +370,12 @@ public class Map : MonoBehaviour
             for (int y_count = default; y_count < count; y_count++)
             {
                 // 削除する配列に入れる
-                _delete_Queue[queue] = _delete_Queue_y[y_count];
-                queue++;
+                _delete_Queue[_queue] = _delete_Queue_y[y_count];
+                _queue++;
             }
+
+            // 仮に入れた配列を初期化
+            _delete_Queue_y = new GameObject[Variables._five];
         }
         // 2以下の場合
         else
@@ -379,7 +397,12 @@ public class Map : MonoBehaviour
             Destroy(_delete_Queue[count]);
             Debug.Log("A");
 
+        }
          _playerController._now_state = PlayerController._player_State.Fall;
+
+        if (_queue == Variables._zero)
+        {
+            _playerController._now_state = PlayerController._player_State.Move;
         }
     }
 
@@ -394,6 +417,7 @@ public class Map : MonoBehaviour
         {
             for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
             {
+                // Dropが存在しないところに生成する
                 if (_stage_Object[y, x] == null)
                 {
                     // Drop生成
@@ -421,12 +445,15 @@ public class Map : MonoBehaviour
         {
             for (int x = default; x < _stage_Object.GetLength(Variables._one); x++)
             {
+                // 配列上に存在しないとき
                 if (_stage_Object[y, x] == null)
                 {
                     Debug.Log(_stage_Object[y, x]);
 
+                    // Dropが存在するところまでy軸を加算
                     for (int fetch_y = y + Variables._one; fetch_y < _stage_Object.GetLength(Variables._zero); fetch_y++)
                     {
+                        // 存在したら下におろす
                         if (_stage_Object[fetch_y, x])
                         {
                             _stage_Object[y, x] = _stage_Object[fetch_y, x];
